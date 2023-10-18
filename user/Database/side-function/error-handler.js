@@ -13,7 +13,7 @@ Sentry.init({
     tracesSampleRate: 1.0,
     // Set sampling rate for profiling - this is relative to tracesSampleRate
     profilesSampleRate: 1.0,
-  });
+  });//
   module.exports = (app)=>{
     app.use((error,req,res,next)=>{
         Sentry.captureException(error);
