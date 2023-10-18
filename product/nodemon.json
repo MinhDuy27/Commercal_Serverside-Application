@@ -1,0 +1,7 @@
+{
+    "env":{
+        "MONGODB_PassWord" :"rcNEmXyeOirlZIh7",
+        "Port" : "3000",
+        "JWT_code" :"nobody know"
+    }
+}
