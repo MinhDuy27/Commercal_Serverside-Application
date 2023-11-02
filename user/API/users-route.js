@@ -79,7 +79,7 @@ module.exports = (app) => {
   app.put('/users/cart/add',userauth, async (req,res,next) => {
     const { _id, quantity } = req.body; // product's info
     try {   
-        const data =  await service.addtocart(req.user._id,_id, quantity, false)//false === add
+        const data =  await service.addtocart(req.user._id,_id, quantity, false)//false = add
         return json(data);
     } catch (err) {
         next(err)
@@ -89,7 +89,7 @@ module.exports = (app) => {
   app.delete('/users/cart/delete',userauth, async (req,res,next) => {
     const { _id } = req.body; // product's info
     try {   
-        const data =  await service.addtocart(req.user._id,_id, quantity, true)//true ===remove
+        const data =  await service.addtocart(req.user._id,_id, quantity, true)//true = delete
         return json(data);
     } catch (err) {
         next(err)

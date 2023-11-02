@@ -12,10 +12,9 @@ const storage = multer.diskStorage({
 
   const filefilter = (req, file, cb) => {
     // reject a file
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-        cb(null, true);
-    } else {
-        cb(null, false);
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") 
+        cb(null, true)
+    else {
         const err = new Error('Only .png, .jpg and .jpeg format allowed!')
         err.name = 'ExtensionError'
         return cb(err);

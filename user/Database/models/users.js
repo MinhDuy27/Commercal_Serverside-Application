@@ -15,15 +15,15 @@ const usersschema = new Schema({
           product: { type: Schema.Types.ObjectId, require: true},
           unit: { type: Number, require: true}
         }
-    ]
-    ,
+    ],
     orders: [ 
         { type: Schema.Types.ObjectId, require: true }
     ],
     notification:[
         {
-            infor: {type: String, require: true},
-            date: {type: String, require: true}
+            content: {type: String, require: true},
+            date: {type: String, require: true},
+            status: {type: String, require: true}
         }
     ]
 },{

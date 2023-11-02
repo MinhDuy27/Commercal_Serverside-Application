@@ -15,25 +15,18 @@ class usersrepository {
       return await users.save();
     
   }
-  async createaddress({ _id,country, province, city, street }) {
- 
+  async createaddress({ _id,ProvinceOrCity,District,CommuneOrWard,HouseNumber }) {
       const profile = await usersmodel.findById(_id);
-
-      if (profile) {
-        const newAddress = new addressmodel({
-          country,
-          province,
-          city,
-          street,
-        });
-        await newAddress.save();
-        profile.address.push(newAddress);
-      }
-      // save the address if push in
+      const newAddress = new addressmodel({
+        ProvinceOrCity,
+        District,
+        CommuneOrWard,
+        HouseNumber,
+      });
+      await newAddress.save();
+      profile.address.push(newAddress);
       return await profile.save();
-    
   }
-
   async changepassword({email,userpassword}){
         const query = { email: email };
         const update = { $set: { password: userpassword }};
@@ -95,18 +88,6 @@ class usersrepository {
         const cartSaveResult = await profile.save();
         return cartSaveResult.cart;
   }
-
-//   async addordertoprofile(customerid, order) {
-   
-//       const profile = await usersmodel.findById(customerid);
-//         if (profile.orders == undefined) {
-//           profile.orders = [];
-//         }
-//         profile.orders.push(order);
-//         profile.cart = [];
-//          return await profile.save();
-    
-//   }
 }
 
 module.exports = usersrepository;

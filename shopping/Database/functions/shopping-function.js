@@ -1,4 +1,4 @@
-// const usersmodel = require("../models/users");
+// const usersmodel = require("../models/users"); // Implement RPC rabbitmq to get usermodels
 const ordermodel = require("../models/order");
 const { v4: uuidv4 } = require('uuid'); //generate uniq id
 const order = require("../models/order");
@@ -55,7 +55,6 @@ class shoppingrepository {
             const orderResult = await order.save();
 
             profile.orders.push(orderResult);
-            //profile.userid.push(usersid);
             await profile.save();
             return orderResult;
         }

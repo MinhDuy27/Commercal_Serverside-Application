@@ -44,16 +44,7 @@ class productrepository {
         .in(selectedIds.map((_id) => _id))
   }
   async  findproductsbyprice(sortorder,category) {
-      if(category==='all')
-      {
-        return await productsmodel.find({})
-        .sort({price: sortorder})
-      }
-      else{
-        return await productsmodel.find({ type: category })
-        .sort({price: sortorder})
-     
-      }
+      return await category === alll ? productsmodel.find().sort({price: sortorder}) : productsmodel.find({ type:category}).sort({price: sortorder})
   }
   async deleteproductbyid(productid){
         return await productsmodel.deleteMany({_id : productid})
