@@ -29,7 +29,7 @@ module.exports.generatesalt = async () => {
   module.exports.validatesignature = async (req) => {
     try {
       const signature = req.get("Authorization");//get value from header
-      console.log(signature);
+     // console.log(signature);
       const payload = await jwt.verify(signature.split(" ")[1], process.env.JWT_code);
       req.user = payload;
       return true;

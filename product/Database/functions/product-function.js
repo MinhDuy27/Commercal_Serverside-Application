@@ -44,10 +44,16 @@ class productrepository {
         .in(selectedIds.map((_id) => _id))
   }
   async  findproductsbyprice(sortorder,category) {
-      return await category === alll ? productsmodel.find().sort({price: sortorder}) : productsmodel.find({ type:category}).sort({price: sortorder})
+      return await category === 'all' ? productsmodel.find().sort({price: sortorder}) : productsmodel.find({ type:category}).sort({price: sortorder})
   }
   async deleteproductbyid(productid){
         return await productsmodel.deleteMany({_id : productid})
+  }
+  async updateproduct(productid,qty,isplace){
+      const product = await productsmodel.findById(productid);
+      let quantity = product.quantity;
+      let updatedquantity = isplace ? quantity - Number(qty) : quantity + Number(qty);
+      return await productsmodel.findByIdAndUpdate(productid,{quantity : updatedquantity});
   }
 }
 

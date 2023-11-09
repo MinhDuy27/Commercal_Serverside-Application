@@ -2,8 +2,8 @@ const  usersmodel  = require("../models/users");
 const  addressmodel  = require("../models/address");
 
 class usersrepository {
-  async createusers({ email,password,name,salt,phone }) {
-    
+  async createusers( {email,password,name,salt,phone }) {
+      console.log(password)
       const users = new usersmodel({
         email,
         password,
@@ -47,47 +47,8 @@ class usersrepository {
       return await usersmodel.findOne({ email: email }); 
   }
 
-  async findusersbyid({ id }) {
-      const existingusers = await usersmodel.findById(id)
-        .populate("address")
-        .populate("orders")
-        .populate("cart.product");
-      return existingusers;
+  async findusersbyid({ _id }) {
+      return await usersmodel.findById(_id);
   }
-  
-  async addcartitem(usersid, productid, quantity, isRemove) {
-      const profile = await usersmodel.findById(usersid);
-        const cartItem = {
-          product: productid,
-          unit: quantity,
-        };
-
-        let cartItems = profile.cart;
-
-        if (cartItems.length > 0) {
-          let isExist = false;
-          cartItems.map((item) => {
-            if (item.product.toString() === productid.toString()) {
-              if (isRemove) {
-                cartItems.splice(cartItems.indexOf(item), 1);
-              } else {
-                item.unit = quantity;
-              }
-              isExist = true;
-            }
-          });
-
-          if (!isExist) {
-            cartItems.push(cartItem);
-          }
-        } else {
-          cartItems.push(cartItem);
-        }
-
-        profile.cart = cartItems;
-        const cartSaveResult = await profile.save();
-        return cartSaveResult.cart;
-  }
-}
-
+};
 module.exports = usersrepository;

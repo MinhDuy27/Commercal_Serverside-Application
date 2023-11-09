@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const orderschema = new Schema({
-    usersid: mongoose.Schema.Types.ObjectId,//unique
+    userid: mongoose.Schema.Types.ObjectId,//unique
     orderid: String,//unique
     orderdate:String,
     status: String,
@@ -11,7 +11,7 @@ const orderschema = new Schema({
     deliveryway: String,
     items: [
         {   
-            product: {type: Schema.Types.ObjectId, required: true} ,
+            product:Schema.Types.Mixed,
             unit: { type: Number, require: true} 
         }
     ]

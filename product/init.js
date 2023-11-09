@@ -2,7 +2,7 @@ const express = require('express');
 const cors  = require('cors');
 const{products} = require('./API');
 const morgan = require('morgan');
-module.exports = async (app) => {
+module.exports = async (app,channel) => {
 
     app.use(express.json()); // handle json request
     app.use(express.urlencoded({ extended:false})); // handle form data request 
@@ -10,7 +10,7 @@ module.exports = async (app) => {
     app.use(morgan("dev"));
     app.use('/Uploaded-image',express.static('Uploaded-image'))
     //api
-    products(app);
+    products(app,channel);
     
     app.use((req,res,next)=>{
         const error = new Error('Not Found');

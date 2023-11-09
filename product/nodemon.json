@@ -2,6 +2,7 @@
     "env":{
         "MONGODB_PassWord" :"x09iKdMGMPImgvbr",
         "Port" : "8001",
-        "JWT_code" :"nobody know"
+        "JWT_code" :"nobody know",
+        "EXCHANGE_NAME":"ONLINE-SHOPPING"
     }
 }

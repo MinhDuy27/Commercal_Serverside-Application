@@ -1,6 +1,7 @@
 const productservice = require('../service/product-service');
 const userauth = require('./middlewares/auth')
 const multer = require("multer")
+const {SubscribeMessage}  = require('../message-broker/message-broker');
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
       cb(null, './Uploaded-image/');
@@ -9,7 +10,6 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);  
     }
   });
-
   const filefilter = (req, file, cb) => {
     // reject a file
     if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") 
@@ -20,15 +20,15 @@ const storage = multer.diskStorage({
         return cb(err);
     }
   };
-
   const upload = multer({
     storage: storage,
     fileFilter:filefilter
   }).array('productimage', 4);
-module.exports = (app) => {
+
+module.exports = (app,channel) => {
     
     const proservice = new productservice();
-
+    SubscribeMessage(channel,proservice);
     //create product
     app.post('/product/create', upload,async(req,res,next) => {
         try {

@@ -14,8 +14,9 @@ const productschema= mongoose.Schema({
     toJSON: {
         transform(doc, ret){
             delete ret.__v;      
+            delete ret.createdAt;
+            delete ret.updatedAt;
         }
     },
-    timestamps: true
 })
 module.exports = mongoose.model('products',productschema);

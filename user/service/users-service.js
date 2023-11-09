@@ -20,7 +20,7 @@ class usersservice {
     }
     async changepassword(userinputs) {
         const { email, oldpassword, newpassword } = userinputs;
-        const existingusers = await this.repository.findusers({ email });
+        const existingusers = await this.repository.findusers( email );
         if (!existingusers)
             throw new notfoundError("user not found by provided email")
         const validPassword = await validatepassword(oldpassword, existingusers.password, existingusers.salt);
@@ -31,18 +31,18 @@ class usersservice {
     }
     async signup(userinputs) {
         const { email, password, name, phone } = userinputs;
-        const existingusers = await this.repository.findusers({ email });
+        const existingusers = await this.repository.findusers( email );
         if (existingusers)
-            throw new validationError("email was created")
-        // create salt
+            throw new validationError("email was used")
+        //create salt
         let salt = await generatesalt();
         let userPassword = await generatepassword(password, salt);
-        const existinguser = await this.repository.createusers({ email, password: userPassword, name, salt, phone });
+        const existinguser = await this.repository.createusers({ email,password: userPassword, name, salt, phone });
         return { id: existinguser._id };
     }
     async postnotify(userinput) {
         const { email, infor } = userinput;
-        const existingusers = await this.repository.findusers({ email });
+        const existingusers = await this.repository.findusers(email );
         if (!existingusers) throw new notfoundError("user not found by provided email")
         return await this.repository.postnotify({ email, infor });
     }
@@ -50,15 +50,10 @@ class usersservice {
         const {ProvinceOrCity,District,CommuneOrWard,HouseNumber } = userinputs;
         return await this.repository.createaddress({ _id,ProvinceOrCity,District,CommuneOrWard,HouseNumber  })
     }
-    async getprofile(id) {
-        const existinguser = await this.repository.findusersbyid({ id });
-        if (!existinguser) throw new notfoundError("user not found by provided id")
+    async getprofile(_id) {
+         const existinguser = await this.repository.findusersbyid({ _id });
+         if (!existinguser) throw new notfoundError("user not found by provided id")
         return existinguser;
-    }
-    async addtocart(userid, productid, qty, isRemove) {
-             const existinguser = await this.repository.findusersbyid({ id });
-             if (!existinguser) throw new notfoundError("user not found by provided id")
-            return  await this.repository.addcartitem(userid, productid, qty, isRemove);
     }
 }
 

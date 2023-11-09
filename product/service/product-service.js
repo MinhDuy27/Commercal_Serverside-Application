@@ -53,6 +53,22 @@ class productservice {
     async getproductinpriceorder(sortorder, category) { // 1  ascending , -1 descending
         return await this.repository.findproductsbyprice(sortorder, category);
     }
+
+    async subscribeevents(payload){
+        payload = JSON.parse(payload);
+        const { event,productid,qty } = payload;
+        
+        switch(event){
+            case 'placeorder':
+                this.repository.updateproduct(productid, qty, true); // true = remove / fale = add more
+                break;
+            case 'deleteorder':
+                this.repository.updateproduct(productid, qty, false); // true = remove / fale = add more
+                break;
+        }
+
+    }
 }
+
 
 module.exports = productservice;

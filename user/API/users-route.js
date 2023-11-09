@@ -1,19 +1,18 @@
 const usersservice = require("../service/users-service");
 const userauth = require("./middlewares/auth");
 
+
 module.exports = (app) => {
   const service = new usersservice();
   app.post("/users/signup", async (req, res, next) => {
     try{
       const { email, password,name, phone } = req.body;
       const   mydata   = await service.signup({ email, password, name, phone });
-     return  res.josn(mydata)
+     return  res.json(mydata)
     }
     catch(error){
       next(error)
-    }
-     
-    
+    } 
   });
   app.put("/users/changepassword",userauth, async (req, res, next) => {
     try {
@@ -69,40 +68,10 @@ module.exports = (app) => {
   app.get("/users/profile", userauth, async (req, res, next) => {
     try {
       const { _id } = req.user;
-      const  data  = await service.getprofile({ _id });
+      const  data  = await service.getprofile( _id );
       return res.json(data);
     } catch (err) {
       next(err);
     }
   });
-   // add product to cart
-  app.put('/users/cart/add',userauth, async (req,res,next) => {
-    const { _id, quantity } = req.body; // product's info
-    try {   
-        const data =  await service.addtocart(req.user._id,_id, quantity, false)//false = add
-        return json(data);
-    } catch (err) {
-        next(err)
-    }
-  });
-  //delete product in cart
-  app.delete('/users/cart/delete',userauth, async (req,res,next) => {
-    const { _id } = req.body; // product's info
-    try {   
-        const data =  await service.addtocart(req.user._id,_id, quantity, true)//true = delete
-        return json(data);
-    } catch (err) {
-        next(err)
-    }
- });
-  //get cart info
-  app.get('/users/cart', userauth, async (req,res,next) => {
-    const { _id } = req.user; // users _id
-    try {
-        const  data  = await service.getprofile(_id);
-        return res.json(data.cart);
-    } catch (err) {
-        next(err);
-    }
-});
 };
