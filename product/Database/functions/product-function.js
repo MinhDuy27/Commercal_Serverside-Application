@@ -25,9 +25,12 @@ class productrepository {
       return  await product.save();
   }
 
-  async getproducts() {
-      return await productsmodel.find();
-  }
+  // async getproducts() {
+  //     return await productsmodel.find();
+  // }
+  async getproducts(value) {
+    return await productsmodel.find().skip(value*20).limit(20);
+}
 
   async findbyid(productid) {
       return await productsmodel.findOne({_id: productid});

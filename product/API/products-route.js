@@ -2,6 +2,11 @@ const productservice = require('../service/product-service');
 const userauth = require('./middlewares/auth')
 const multer = require("multer")
 const {SubscribeMessage}  = require('../message-broker/message-broker');
+// caching in redis
+const redis = require('redis');
+const client = redis.createClient(process.env.REDIS_PORT)
+client.connect()
+//multer to load image
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
       cb(null, './Uploaded-image/');
@@ -85,11 +90,19 @@ module.exports = (app,channel) => {
             next(error)
         }
     });
-   //get the list of all products
-    app.get('/product', async (req,res,next) => {
-        try {
-            const data = await proservice.getproducts();        
-            return res.status(200).json(data);
+  
+    //get 20 product in collection each time
+    app.get('/product/collection/:value', async (req,res,next) => {
+        try {     
+            const value = req.params.value;
+            let data = await client.get(value)
+            if(!data)
+            {
+                data = await proservice.getproducts(value);   
+                await client.set(value,JSON.stringify(data));   //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
+                return res.status(200).json(data);       
+            } 
+            return res.json(JSON.parse(data));//JSON.parse(data) : JSON ->  JavaScript objects(data for manipulating) 
         } catch (error) {
             next(error)
         }

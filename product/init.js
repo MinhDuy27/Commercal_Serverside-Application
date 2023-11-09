@@ -2,7 +2,7 @@ const express = require('express');
 const cors  = require('cors');
 const{products} = require('./API');
 const morgan = require('morgan');
-module.exports = async (app,channel) => {
+module.exports = async (app,channel,client) => {
 
     app.use(express.json()); // handle json request
     app.use(express.urlencoded({ extended:false})); // handle form data request 
