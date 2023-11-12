@@ -99,7 +99,9 @@ module.exports = (app,channel) => {
             if(!data)
             {
                 data = await proservice.getproducts(value);   
-                await client.set(value,JSON.stringify(data));   //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
+                await client.set(value,JSON.stringify(data),'EX', 3600, (error,result)=>{ //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
+                    if (error) next(error)
+                });   
                 return res.status(200).json(data);       
             } 
             return res.json(JSON.parse(data));//JSON.parse(data) : JSON ->  JavaScript objects(data for manipulating) 
