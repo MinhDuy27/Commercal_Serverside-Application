@@ -8,29 +8,45 @@ class productservice {
     constructor() {
         this.repository = new productrepository();
     }
-
     async createproduct(productinputs) {
-        return await this.repository.createproduct(productinputs)
-    }
+        try {
+          const productresult = await this.repository.createproduct(productinputs);
+          return formatedata(productresult);
+        } catch (err) {
+          throw err;
+        }
+      }
 //
     async deleteproductbyid(productid) {
-        if (isValidObjectId(productid)) {
-            const product = await this.repository.findbyid(productid);
-            if (!product)
-                throw new notfoundError("product id is not available");
-            return this.repository.deleteproductbyid(productid)
+        try {
+        const result = await this.repository.deleteproductbyid(productid);
+        return formatedata(result);
+        } catch (err) {
+        throw err;
         }
-        throw new validationError("invalid ID")
     }
-    // async getproducts() {
-    //     const products = await this.repository.getproducts();
-    //     let categories = {};
-    //     products.map(({ type }) => {
-    //         categories[type] = type;
-    //     });
-    //     return products
-    // }
-
+    async getproducts() {
+        try {
+          const products = await this.repository.getproducts();
+          let categories = {};
+          products.map(({ type }) => {
+            categories[type] = type;
+          });
+          return formatedata(products);
+        } catch (err) {
+          throw err;
+        }
+      }
+    async approveproduct(productid) {
+        try {
+          const result = await this.repository.approveproductbyid(productid);
+          // console.log(result);
+          return result;
+        } catch (err) {
+          throw err;
+        }
+      }
+    
     async getproducts(value) {
         const products = await this.repository.getproducts(value);
         let categories = {};
@@ -64,8 +80,7 @@ class productservice {
 
     async subscribeevents(payload){
         payload = JSON.parse(payload);
-        const { event,productid,qty } = payload;
-        
+        const {event, productid,qty } = payload;
         switch(event){
             case 'placeorder':
                 this.repository.updateproduct(productid, qty, true); // true = remove / fale = add more
@@ -73,9 +88,60 @@ class productservice {
             case 'deleteorder':
                 this.repository.updateproduct(productid, qty, false); // true = remove / fale = add more
                 break;
+            case 'deleteproduct':
+              this.repository.deleteproductbyid(productid)
         }
 
     }
+    async updateproduct(newinfo) {
+        try {
+          const product = await this.repository.updateproductinformation(newinfo);
+          return 'Product delete request sent';
+        } catch (err) {
+          throw err;
+        }
+      }
+  
+      async getrequestingproduct(request) {
+        try {
+          //get upload request
+          if (request === 'upload-requested') {
+            const product = await this.repository.getuploadrequestproduct();
+            return formatedata(product);
+          } else if (request === 'delete') {
+            //get delete request
+            const product = await this.repository.getdeleterequestproduct();
+            return formatedata(product);
+          } else {
+            return {};
+          }
+        } catch (err) {
+          throw err;
+        }
+      }
+    
+      async getproductbyuploaduser(userid) {
+        try {
+          const product = await this.repository.getproductbyuploaduserid(userid);
+          return formatedata(product);
+        } catch (err) {
+          throw err;
+        }
+      }
+    
+      async getavailableproducts() {
+        try {
+          const products = await this.repository.getavailableproduct();
+          // let categories = {};
+          // products.map(({ type }) => {
+          //   categories[type] = type;
+          // });
+          console.log(products);
+          return formatedata(products);
+        } catch (err) {
+          throw err;
+        }
+      }
 }
 
 

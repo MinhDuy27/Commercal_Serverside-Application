@@ -6,58 +6,110 @@ const { validationError } = require("../side-function/app-error");
 const {PublishMessage} = require("../../message-broker/message-broker")
 //Dealing with data base operations
 class shoppingrepository {
-    async getorder(userid) {
-       return await ordermodel.find({ "userid": userid })
+  async getorder(userid) {
+    try {
+      const result = await ordermodel.find({ usersid: userid });
+      return result;
+    } catch (err) {
+      throw err;
     }
-    async deleteorder(userid, orderid,channel) {
-      const query = {
-        userid: userid,
-        orderid: orderid
-      };
-        let event = "deleteorder";
-        let orderitem = await ordermodel.findOne(query);
-        if (orderitem) {
-          let items = orderitem.items;
-          items.map(item=>{
-            const payload = {event:event,productid:item.product._id,qty:item.unit};
-            PublishMessage(channel,"PRODUCT-BROKER",JSON.stringify(payload));
-          })
-          const result = await ordermodel.findOneAndDelete(query);
-          return result;
-        }
-        else {
-            throw new validationError("user's order is empty");
-        }
-    }//
-    async createneworder(userid,deliveryaddress,channel) {
+  }
+  async getallorders() {
+    try {
+      const result = await ordermodel.find();
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getoneorder(orderid) {
+    try {
+      const result = await ordermodel.findById(orderid);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async deleteorder(userid, orderid,channel) {
+    const query = {
+      userid: userid,
+      orderid: orderid
+    };
+      let event = "deleteorder";
+      let orderitem = await ordermodel.findOne(query);
+      if (orderitem) {
+        let items = orderitem.items;
+        items.map(item=>{
+          const payload = {event:event,productid:item.product._id,qty:item.unit};
+          PublishMessage(channel,"PRODUCT-BROKER",JSON.stringify(payload));
+        })
+        const result = await ordermodel.findOneAndDelete(query);
+        return result;
+      }
+      else {
+          throw new validationError("user's order is empty");
+      }
+  }//
+  async createneworder(userid,deliveryaddress,channel) {
         let amount = 0;
         let event = "placeorder";
         let cart = await cartmodel.findOne({userid: userid});
         let cartItems = cart.items;
         cart.items = [];
         cart.save();
-        if (cartItems.length>0) {
-            cartItems.map(item => {
-                amount += parseInt(item.product.price) * parseInt(item.unit);
-                const payload = {event:event,productid:item.product._id,qty:item.unit};
-                PublishMessage(channel,"PRODUCT-BROKER",JSON.stringify(payload));
-            });
-            const orderid = uuidv4();
-            let orderdate = new Date().toLocaleString();
-            const order = new ordermodel({
+        if (cartItems.length > 0) {
+          const orderResults =  await Promise.all(
+            cartItems.map(async (item) => {
+              amount += parseInt(item.product.price) * parseInt(item.unit);
+              const rpcpayload = { productid: item.product._id };
+              const getproduct = await RPCRequest("PRODUCT-RPC", rpcpayload);
+              const {quantity} = getproduct
+              const productLeft  = parseInt(quantity) - parseInt(item.unit);
+              if(productLeft < 0 )
+              {
+                console.log(item.product.name);
+                throw new Error (
+                      'Number of product ' +
+                      item.product.name +
+                      " exceeds product's current quantity",
+                  
+                  );
+              }
+              else{
+                const brokerpayload = {
+                  event: event,
+                  productid: item.product._id,
+                  qty: item.unit,
+                };
+                PublishMessage(channel, "PRODUCT-BROKER", JSON.stringify(brokerpayload));
+                if(productLeft == 0)
+                {
+                  const brokerpayload = { event:"deleteproduct",productid: item.product._id};
+                  PublishMessage(channel, "PRODUCT-BROKER", JSON.stringify(brokerpayload));
+                }
+              }
+              const orderid = uuidv4();
+              let orderdate = new Date().toLocaleString();
+              const order = new ordermodel({
                 orderid,
                 orderdate,
-                status: 'processing',
+                status: "done",
                 amount,
                 deliveryaddress,
-                items: cartItems
-            })
-            order.userid = userid;
-            const orderResult = await order.save();
-            return orderResult;
-        }
-        throw new validationError("cart is empty");
+                items: cartItems,
+              });
+              order.userid = userid;
+              const orderResult = await order.save();
+              return orderResult;
+        })
+        );
+        return orderResults
     }
+      else throw new validationError("cart is empty");
+  }
+
     async addcartitem(usersid, productid, qty, isRemove) {
       //
           let cart = await cartmodel.findOne({userid: usersid});

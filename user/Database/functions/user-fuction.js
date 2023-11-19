@@ -25,7 +25,9 @@ class usersrepository {
       });
       await newAddress.save();
       profile.address.push(newAddress);
-      return await profile.save();
+      await profile.save();
+
+      return profile;
   }
   async changepassword({email,userpassword}){
         const query = { email: email };
@@ -48,7 +50,7 @@ class usersrepository {
   }
 
   async findusersbyid({ _id }) {
-      return await usersmodel.findById(_id);
+      return await usersmodel.findById(_id).populate("address");
   }
 };
 module.exports = usersrepository;

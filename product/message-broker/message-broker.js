@@ -24,7 +24,6 @@ module.exports.CreateChannel = async () => {
       (msg) => {
         if (msg.content) {
           service.subscribeevents(msg.content.toString());
-          //service.subscribeevents(msg.content.toString());
         }
       },
       {

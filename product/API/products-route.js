@@ -31,36 +31,76 @@ const storage = multer.diskStorage({
   }).array('productimage', 4);
 
 module.exports = (app,channel) => {
-    
     const proservice = new productservice();
     SubscribeMessage(channel,proservice);
+
     //create product
-    app.post('/product/create', upload,async(req,res,next) => {
+    app.post('/admin/create',async(req,res,next) => {
         try {
-            const listimage = req.files;
-            const productimage =  new Array();
-            listimage.map(item=>{
-                productimage.push(item.path)
-            })
-            const { name,price,quantity ,type,status,specification,reasonforsale} = req.body;
-            const  data  =  await proservice.createproduct({ name,price,quantity,type,status,specification,reasonforsale,productimage});
-             return res.json(data);
-        } catch (error) {
-            next(error)    
-        }  
-    });
+            const {
+              uploaduserid,
+              name,
+              price,
+              quantity,
+              type,
+              specs,
+              reasonforsale,
+              img,
+            } = req.body;
+            // validation
+            const status = 'available';
+            const specification = JSON.stringify(specs);
+            const image = JSON.stringify(img);
+            // console.log(img);
+            const { data } = await proservice.createproduct({
+              uploaduserid,
+              name,
+              price,
+              quantity,
+              type,
+              status,
+              specification,
+              reasonforsale,
+              image,
+            });
+            return res.json(data);
+          } catch (err) {
+            next(err);
+          }
+        });
+
     //delete product by id
-    app.delete('/product/delete/:id', async(req,res,next) => {
+    app.delete('/admin/delete/:id', async(req,res,next) => {
         try {
             const id = req.params.id;
-             await proservice.deleteproductbyid(id);
-            return res.json({message:"item deleted"});
+            if (isValidObjectId(id)) {
+              await proservice.deleteproductbyid(id);
+              return res.status(200).json({ message: 'item deleted' });
+            } else {
+              return res.status(400).json({
+                error: {
+                  message: 'invalid id',
+                },
+              });
+            }
         } catch (error) {
             next(error)    
         }
     });
+
+    //approve product
+    app.patch('/admin/approve-product/:productid', async (req, res, next) => {
+          const productid = req.params.productid;
+          try {
+            const data = await proservice.approveproduct(productid);
+            return res.status(200).json(data);
+          } catch (err) {
+            next(err);
+          }
+        },
+      );
     // get stuff by type (books,ticket,...)
-    app.get('/product/category/:type', async(req,res,next) => {
+    app.get('/category/:type', async(req,res,next) => {
         const type = req.params.type;
         try {
             const  data  = await proservice.getproductsbycategory(type)
@@ -70,7 +110,7 @@ module.exports = (app,channel) => {
         }
     });
     //get product by product's id
-    app.get('/product/:id', async(req,res,next) => {
+    app.get('/:id', async(req,res,next) => {
         try {
                 const productid = req.params.id;
                 const data  = await proservice.getproductbyid(productid);
@@ -81,7 +121,7 @@ module.exports = (app,channel) => {
         }
     });
     // get the order by id list in cart
-    app.get('/product/ids',userauth, async(req,res,next) => {
+    app.get('/ids',userauth, async(req,res,next) => {
         try {
             const { ids } = req.body;
             const products = await proservice.getselectedproducts(ids);
@@ -90,27 +130,26 @@ module.exports = (app,channel) => {
             next(error)
         }
     });
-  
     //get 20 product in collection each time
-    app.get('/product/collection/:value', async (req,res,next) => {
+    app.get('/collection/:value', async (req,res,next) => {
         try {     
             const value = req.params.value;
-            let data = await client.get(value)
-            if(!data)
-            {
+            // let data = await client.get(value)
+            // if(!data)
+            // {
                 data = await proservice.getproducts(value);   
-                await client.set(value,JSON.stringify(data),'EX', 3600, (error,result)=>{ //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
-                    if (error) next(error)
-                });   
+                // await client.set(value,JSON.stringify(data),'EX', 10, (error,result)=>{ //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
+                //     if (error) next(error)
+                // });   
                 return res.status(200).json(data);       
-            } 
-            return res.json(JSON.parse(data));//JSON.parse(data) : JSON ->  JavaScript objects(data for manipulating) 
+            // } 
+            //return res.json(JSON.parse(data));//JSON.parse(data) : JSON ->  JavaScript objects(data for manipulating) 
         } catch (error) {
             next(error)
         }
     });
     //get products with price frow low to high
-    app.get('/product/ascending/category/:type', async (req,res,next) => {
+    app.get('/ascending/category/:type', async (req,res,next) => {
         try {
             const {data} = await proservice.getproductinpriceorder(1,req.params.type);        
             return res.status(200).json(data);
@@ -119,7 +158,7 @@ module.exports = (app,channel) => {
         }
     });
     //get products with price frow high to low
-    app.get('/product/descending/category/:type', async (req,res,next) => {
+    app.get('/descending/category/:type', async (req,res,next) => {
         try {
             const {data} = await proservice.getproductinpriceorder(-1,req.params.type);        
             return res.status(200).json(data);
@@ -127,5 +166,38 @@ module.exports = (app,channel) => {
             next(error)
         }
     });
+
+     //get all products that being requested to upload
+    app.get('/product/admin/upload-requests', async (req, res, next) => {
+    try {
+      //find product that status = upload-requested
+      const { data } =
+        await proservice.getrequestingproduct('upload-requested');
+      return res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  //get all products that being requested to delete
+    app.get('/product/admin/delete-requests', async (req, res, next) => {
+    try {
+      //find product that status != "upload-requested" && != available
+      const { data } = await proservice.getrequestingproduct('delete');
+      return res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+    // get all prodcts that availble
+     app.get('/product/available', async (req, res, next) => {
+    try {
+      console.log('data');
+      const { data } = await proservice.getavailableproducts();
+      return res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
     
 }

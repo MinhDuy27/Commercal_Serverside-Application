@@ -1,6 +1,6 @@
 const express = require('express');
 const cors  = require('cors');
-const{products} = require('./API');
+const{products,sales} = require('./API');
 const morgan = require('morgan');
 module.exports = async (app,channel,client) => {
 
@@ -11,7 +11,7 @@ module.exports = async (app,channel,client) => {
     app.use('/Uploaded-image',express.static('Uploaded-image'))
     //api
     products(app,channel);
-    
+    sales(app);
     app.use((req,res,next)=>{
         const error = new Error('Not Found');
         error.status = 404;

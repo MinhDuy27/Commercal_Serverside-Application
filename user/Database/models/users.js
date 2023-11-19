@@ -10,22 +10,6 @@ const usersschema = new Schema({
     address:[
         { type: Schema.Types.ObjectId, ref: 'address', require: true }
     ],
-    // cart: [
-    //     {
-    //       product: { type: Schema.Types.ObjectId, require: true},
-    //       unit: { type: Number, require: true}
-    //     }
-    // ],
-    // orders: [ 
-    //     { type: Schema.Types.ObjectId, require: true }
-    // ],
-    notification:[
-        {
-            content: {type: String, require: true},
-            date: {type: String, require: true},
-            status: {type: String, require: true}
-        }
-    ]
 },
 //,{timestamps: false,
 {
