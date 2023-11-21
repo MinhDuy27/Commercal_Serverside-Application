@@ -1,6 +1,6 @@
 const { userrepository } = require("../Database");
 const { notfoundError, validationError } = require("../Database/side-function/app-error");
-const { generatepassword, generatesignature, validatepassword, generatesalt } = require('../Database/side-function/side1');
+const { generatepassword, generatesignature, validatepassword, generatesalt, formatedata } = require('../Database/side-function/side1');
 
 //logic
 class usersservice {
@@ -47,8 +47,16 @@ class usersservice {
         return await this.repository.postnotify({ email, infor });
     }
     async addnewaddress(_id, userinputs) {
-        const {ProvinceOrCity,District,CommuneOrWard,HouseNumber } = userinputs;
-        return await this.repository.createaddress({ _id,ProvinceOrCity,District,CommuneOrWard,HouseNumber  })
+        const {country,
+            province,
+            city,
+            street, } = userinputs;
+        const data =  this.repository.createaddress({ _id,
+            country,
+            province,
+            city,
+            street, })
+        return formatedata(data)
     }
     async getprofile(_id) {
          const existinguser = await this.repository.findusersbyid({ _id });

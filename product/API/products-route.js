@@ -3,9 +3,9 @@ const userauth = require('./middlewares/auth')
 const multer = require("multer")
 const {SubscribeMessage}  = require('../message-broker/message-broker');
 // caching in redis
-const redis = require('redis');
-const client = redis.createClient(process.env.REDIS_PORT)
-client.connect()
+// const redis = require('redis');
+// const client = redis.createClient(process.env.REDIS_PORT)
+// client.connect()
 //multer to load image
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -121,15 +121,15 @@ module.exports = (app,channel) => {
         }
     });
     // get the order by id list in cart
-    app.get('/ids',userauth, async(req,res,next) => {
-        try {
-            const { ids } = req.body;
-            const products = await proservice.getselectedproducts(ids);
-            return res.status(200).json(products);
-        } catch (error) {
-            next(error)
-        }
-    });
+    // app.get('/ids',userauth, async(req,res,next) => {
+    //     try {
+    //         const { ids } = req.body;
+    //         const products = await proservice.getselectedproducts(ids);
+    //         return res.status(200).json(products);
+    //     } catch (error) {
+    //         next(error)
+    //     }
+    // });
     //get 20 product in collection each time
     app.get('/collection/:value', async (req,res,next) => {
         try {     
@@ -168,7 +168,7 @@ module.exports = (app,channel) => {
     });
 
      //get all products that being requested to upload
-    app.get('/product/admin/upload-requests', async (req, res, next) => {
+    app.get('/admin/upload-requests', async (req, res, next) => {
     try {
       //find product that status = upload-requested
       const { data } =
@@ -180,7 +180,7 @@ module.exports = (app,channel) => {
   });
 
   //get all products that being requested to delete
-    app.get('/product/admin/delete-requests', async (req, res, next) => {
+    app.get('/admin/delete-requests', async (req, res, next) => {
     try {
       //find product that status != "upload-requested" && != available
       const { data } = await proservice.getrequestingproduct('delete');
@@ -190,9 +190,8 @@ module.exports = (app,channel) => {
     }
   });
     // get all prodcts that availble
-     app.get('/product/available', async (req, res, next) => {
+     app.get('/all/available', async (req, res, next) => {
     try {
-      console.log('data');
       const { data } = await proservice.getavailableproducts();
       return res.status(200).json(data);
     } catch (err) {

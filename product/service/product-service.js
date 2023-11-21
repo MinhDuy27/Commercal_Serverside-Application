@@ -1,6 +1,7 @@
 const { isValidObjectId } = require('mongoose')
 const { productrepository } = require('../Database');
 const { notfoundError, validationError } = require('../Database/side-function/app-error');
+const {formatedata}  = require('../Database/side-function/side1');
 
 
 // All Business logic will be here
@@ -75,7 +76,9 @@ class productservice {
     }
 
     async getproductinpriceorder(sortorder, category) { // 1  ascending , -1 descending
-        return await this.repository.findproductsbyprice(sortorder, category);
+        
+      const data = await this.repository.findproductsbyprice(sortorder, category);
+      return formatedata(data)
     }
 
     async subscribeevents(payload){
@@ -136,7 +139,6 @@ class productservice {
           // products.map(({ type }) => {
           //   categories[type] = type;
           // });
-          console.log(products);
           return formatedata(products);
         } catch (err) {
           throw err;

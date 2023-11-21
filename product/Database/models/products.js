@@ -1,17 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const productschema= mongoose.Schema({
-    uploadeduserid:{ type: String, required: true },
+    uploaduserid:{ type: String, required: true },
     name: String,
     price : Number,
     quantity: Number,
-    type:{ type: String, default:'upload-requested' },
-    status: String,
+    type:String,
+    specification:String,
+    status: { type: String, default:'upload-requested'},
     reasonforsale: String,
-    specification:{
-        detail: Schema.Types.Mixed
-    },
-    image: String,
+    image: String
 }
 ,{
     toJSON: {

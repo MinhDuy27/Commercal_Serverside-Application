@@ -15,13 +15,13 @@ class usersrepository {
       return await users.save();
     
   }
-  async createaddress({ _id,ProvinceOrCity,District,CommuneOrWard,HouseNumber }) {
+  async createaddress({ _id,country,province,city,street, }) {
       const profile = await usersmodel.findById(_id);
       const newAddress = new addressmodel({
-        ProvinceOrCity,
-        District,
-        CommuneOrWard,
-        HouseNumber,
+        country,
+        province,
+        city,
+        street,
       });
       await newAddress.save();
       profile.address.push(newAddress);

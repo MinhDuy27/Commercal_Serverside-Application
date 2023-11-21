@@ -48,9 +48,6 @@ module.exports = (app) => {
         const { data } = await product_service.getproductbyid(productid);
         const { _id } = req.user;
         const status = req.body.remove_reason;
-        // console.log(_id);
-        // console.log(data);
-
         if (data[0].uploaduserid === _id) {
           //remove request is from uploader
           const newinfo = {
