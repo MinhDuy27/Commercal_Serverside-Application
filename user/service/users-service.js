@@ -16,7 +16,7 @@ class usersservice {
         if (!validPassword)
             throw new validationError("invalid password")
         const token = await generatesignature({ email: existingusers.email, _id: existingusers._id });
-        return { id: existingusers._id, token };
+        return formatedata({ id: existingusers._id, token });
     }
     async changepassword(userinputs) {
         const { email, oldpassword, newpassword } = userinputs;
@@ -33,12 +33,12 @@ class usersservice {
         const { email, password, name, phone } = userinputs;
         const existingusers = await this.repository.findusers( email );
         if (existingusers)
-            throw new validationError("email was used")
+            return null
         //create salt
         let salt = await generatesalt();
         let userPassword = await generatepassword(password, salt);
         const existinguser = await this.repository.createusers({ email,password: userPassword, name, salt, phone });
-        return { id: existinguser._id };
+        return formatedata({ id: existinguser._id });
     }
     async postnotify(userinput) {
         const { email, infor } = userinput;
@@ -47,11 +47,13 @@ class usersservice {
         return await this.repository.postnotify({ email, infor });
     }
     async addnewaddress(_id, userinputs) {
-        const {country,
+        const {
+            country,
             province,
             city,
-            street, } = userinputs;
-        const data =  this.repository.createaddress({ _id,
+            street,} = userinputs;
+        const data =  this.repository.createaddress({
+             _id,
             country,
             province,
             city,
@@ -61,7 +63,7 @@ class usersservice {
     async getprofile(_id) {
          const existinguser = await this.repository.findusersbyid({ _id });
          if (!existinguser) throw new notfoundError("user not found by provided id")
-        return existinguser;
+        return formatedata(existinguser);
     }
 }
 

@@ -3,7 +3,7 @@ const  addressmodel  = require("../models/address");
 
 class usersrepository {
   async createusers( {email,password,name,salt,phone }) {
-      console.log(password)
+    try {
       const users = new usersmodel({
         email,
         password,
@@ -13,7 +13,9 @@ class usersrepository {
         address: [],
       });
       return await users.save();
-    
+    } catch (error) {
+      throw error
+    }   
   }
   async createaddress({ _id,country,province,city,street, }) {
       const profile = await usersmodel.findById(_id);

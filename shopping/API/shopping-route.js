@@ -55,7 +55,7 @@ module.exports = (app,channel) => {
     const { productid } = req.body; // product's info
     let quantity = 0;
     try {   
-        const data =  await shopservice.addtocart(_id,productid, quantity, true)//true = delete
+        const {data} =  await shopservice.addtocart(_id,productid, quantity, true)//true = delete
         return res.json(data);
     } catch (err) {
         next(err)
@@ -96,7 +96,7 @@ module.exports = (app,channel) => {
   app.get('/orders/detail/:id', async (req, res, next) => {
     const orderid = req.params.id;
     try {
-      const data = await shopservice.getorderbyid(orderid);
+      const {data} = await shopservice.getorderbyid(orderid);
       return res.status(200).json(data);
     } catch (err) {
       next(err);

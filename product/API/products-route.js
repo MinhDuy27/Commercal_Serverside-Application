@@ -103,8 +103,8 @@ module.exports = (app,channel) => {
     app.get('/category/:type', async(req,res,next) => {
         const type = req.params.type;
         try {
-            const  data  = await proservice.getproductsbycategory(type)
-            return res.json(data)
+            const  {data}  = await proservice.getproductsbycategory(type)
+            return res.status(200).json(data)
         } catch (error) {
             next(error)
         }
@@ -113,7 +113,7 @@ module.exports = (app,channel) => {
     app.get('/:id', async(req,res,next) => {
         try {
                 const productid = req.params.id;
-                const data  = await proservice.getproductbyid(productid);
+                const {data}  = await proservice.getproductbyid(productid);
                 return res.status(200).json(data);
             } 
         catch (error) {

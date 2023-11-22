@@ -58,7 +58,8 @@ class productservice {
     }
 
     async getproductsbycategory(category) {
-        return await this.repository.findbycategory(category);
+        const data = await this.repository.findbycategory(category);
+        return formatedata(data)
     }
 
     async getselectedproducts(selectedIds) {
@@ -70,7 +71,7 @@ class productservice {
             const product = await this.repository.findbyid(productid);
             if (!product)
                 throw new notfoundError("product id is not available");
-            return product
+            return formatedata(product)
         }
         throw new validationError("invalid ID")
     }

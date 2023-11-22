@@ -72,10 +72,18 @@ class productrepository {
     }
   }
   async  findproductsbyprice(sortorder,category) {
+    try {
       return await category === 'all' ? productsmodel.find().sort({price: sortorder}) : productsmodel.find({ type:category}).sort({price: sortorder})
+    } catch (error) {
+      throw error
+    }
   }
   async deleteproductbyid(productid){
+    try {
         return await productsmodel.deleteMany({_id : productid})
+    } catch (error) {
+      throw error
+    }
   }
   async updateproduct(productid,qty,isplace){
       const product = await productsmodel.findById(productid);

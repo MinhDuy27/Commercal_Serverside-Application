@@ -74,7 +74,6 @@ class shoppingrepository {
                       'Number of product ' +
                       item.product.name +
                       " exceeds product's current quantity",
-                  
                   );
               }
               else{
