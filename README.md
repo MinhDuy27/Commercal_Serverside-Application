@@ -1,5 +1,5 @@
 # microservice - commercial app
-NodeJS(Express), MongoDB, Redis, Sentry.io, RabbitMQ 
+#NodeJS(Express), MongoDB, Redis, Sentry.io, RabbitMQ 
       -overall architecture of project
 ![image](https://github.com/MinhDuy27/microservice-project/assets/146503855/af44d7b8-668d-4522-a8de-44eb05598ff4)
 
