@@ -7,28 +7,28 @@ const {SubscribeMessage}  = require('../message-broker/message-broker');
 // const client = redis.createClient(process.env.REDIS_PORT)
 // client.connect()
 //multer to load image
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-      cb(null, './Uploaded-image/');
-    },
-    filename: function(req, file, cb) {
-        cb(null, file.originalname);  
-    }
-  });
-  const filefilter = (req, file, cb) => {
-    // reject a file
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") 
-        cb(null, true)
-    else {
-        const err = new Error('Only .png, .jpg and .jpeg format allowed!')
-        err.name = 'ExtensionError'
-        return cb(err);
-    }
-  };
-  const upload = multer({
-    storage: storage,
-    fileFilter:filefilter
-  }).array('productimage', 4);
+// const storage = multer.diskStorage({
+//     destination: function(req, file, cb) {
+//       cb(null, './Uploaded-image/');
+//     },
+//     filename: function(req, file, cb) {
+//         cb(null, file.originalname);  
+//     }
+//   });
+//   const filefilter = (req, file, cb) => {
+//     // reject a file
+//     if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") 
+//         cb(null, true)
+//     else {
+//         const err = new Error('Only .png, .jpg and .jpeg format allowed!')
+//         err.name = 'ExtensionError'
+//         return cb(err);
+//     }
+//   };
+//   const upload = multer({
+//     storage: storage,
+//     fileFilter:filefilter
+//   }).array('productimage', 4);
 
 module.exports = (app,channel) => {
     const proservice = new productservice();
@@ -134,16 +134,16 @@ module.exports = (app,channel) => {
     app.get('/collection/:value', async (req,res,next) => {
         try {     
             const value = req.params.value;
-            // let data = await client.get(value)
-            // if(!data)
-            // {
+            let data = await client.get(value)
+            if(!data)
+            {
                 data = await proservice.getproducts(value);   
-                // await client.set(value,JSON.stringify(data),'EX', 10, (error,result)=>{ //stringify:(data) :JavaScript objects -> JSON (data for exchange between server) 
-                //     if (error) next(error)
-                // });   
+                await client.set(value,JSON.stringify(data),'EX', 10, (error,result)=>{  
+                    if (error) next(error)
+                });   
                 return res.status(200).json(data);       
-            // } 
-            //return res.json(JSON.parse(data));//JSON.parse(data) : JSON ->  JavaScript objects(data for manipulating) 
+            } 
+            return res.json(JSON.parse(data)); 
         } catch (error) {
             next(error)
         }
@@ -171,8 +171,7 @@ module.exports = (app,channel) => {
     app.get('/admin/upload-requests', async (req, res, next) => {
     try {
       //find product that status = upload-requested
-      const { data } =
-        await proservice.getrequestingproduct('upload-requested');
+      const { data } =  await proservice.getrequestingproduct('upload-requested');
       return res.status(200).json(data);
     } catch (err) {
       next(err);

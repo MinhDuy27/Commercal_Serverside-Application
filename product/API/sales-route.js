@@ -8,14 +8,7 @@ module.exports = (app) => {
   //request to upload new product
   app.post('/product/upload', userauth, async (req, res, next) => {
     try {
-      // const status = "upload-requested";
-      // const {_id} = req.body;
-      // const uploaduserid =_id;
-      // const {name,price,quantity,type,specification,reasonforsale} = req.body;
-      // const {data} = await product_service.createproduct({uploaduserid,name,price,quantity,type,status,specification,reasonforsale});
-
-      const { name, price, quantity, type, specs, reasonforsale, img } =
-        req.body;
+      const { name, price, quantity, type, specs, reasonforsale, img } = req.body;
       const status = 'upload-requested';
       const { _id } = req.user;
       const uploaduserid = _id;
